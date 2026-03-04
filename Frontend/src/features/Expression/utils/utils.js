@@ -1,17 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  FaceLandmarker,
-  FilesetResolver,
-} from "@mediapipe/tasks-vision";
+import {FaceLandmarker,FilesetResolver,} from "@mediapipe/tasks-vision";
 
-export default function FaceExpression() {
-  const videoRef = useRef(null);
-  const animationFrameId = useRef(null);
-  const faceLandmarkerRef = useRef(null);
-  const [expression, setExpression] = useState("Detecting...");
-  let stream;
 
-  const initialize = async () => {
+
+export const initialize = async ({videoRef,faceLandmarkerRef,stream}) => {
       // 1️⃣ Load MediaPipe model
       const filesetResolver = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -28,16 +19,17 @@ export default function FaceExpression() {
         });
 
       // 2️⃣ Start Camera
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
+      stream.current = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream.current;
 
       videoRef.current.onloadeddata = () => {
         videoRef.current.play();
       };
-    };
+};
 
-    const detect = () => {
+export const detect = ({videoRef,faceLandmarkerRef,animationFrameId,setExpression}) => {
       if (!videoRef.current || !faceLandmarkerRef.current) return;
+    
 
       const results =
         faceLandmarkerRef.current.detectForVideo(
@@ -87,42 +79,4 @@ export default function FaceExpression() {
       }
 
       animationFrameId.current = requestAnimationFrame(detect);
-    };
-
-  useEffect(() => {
-    initialize();
-
-    // 4️⃣ Cleanup
-    return () => {
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
-
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach((track) =>
-          track.stop()
-        );
-      }
-    };
-  }, []);
-
-  return (
-    <div style={{ textAlign: "center" }}>
-      <h2>Live Emotion Detector</h2>
-      <video
-        ref={videoRef}
-        style={{
-          width: "400px",
-          borderRadius: "12px",
-        }}
-        playsInline
-        muted
-      />
-      <h3 style={{ marginTop: "20px" }}>
-        Expression: {expression}
-      </h3>
-
-      <button onClick={detect}>Detect Expression</button>
-    </div>
-  );
-}
+};

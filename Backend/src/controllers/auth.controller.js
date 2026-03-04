@@ -1,0 +1,98 @@
+const userModel = require('../models/user.model')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+async function userRegisterController(req, res){
+    const {username, email, password} = req.body
+
+    const isAlreadyRegistered = await userModel.findOne({
+        $or:[
+            {email},
+            {username}
+        ]
+    })
+
+    if(isAlreadyRegistered){
+        return res.status(400).json({
+            message:"User already exist"
+        })
+    }
+
+    const hash = await bcrypt.hash(password, 10)
+
+    const user = await userModel.create({
+        username,
+        email,
+        password:hash
+    })
+
+    const token = jwt.sign({
+        id:user._id,
+        username:user.username
+        }, process.env.JWT_SECRET,
+        {
+            expiresIn: "3d"
+        }
+    )
+
+    res.cookie("token", token)
+
+    res.status(201).json({
+        message:"User created successfully",
+        user:{
+            id:user._id,
+            username: user.username,
+            email: user.email
+        }
+    })
+}
+
+async function userLoginController(req,res) {
+    const{email, password, username} = req.body
+
+    const user = await userModel.findOne({
+        $or:[
+            {username},
+            {email}
+        ]
+    }).select("+password")
+
+    if(!user){
+        return res.status(400).json({
+            message:"Invalid Credentials" //user not found
+        })
+    }
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password)
+
+    if(!isPasswordMatched){
+        return res.status(400).json({
+            message:"Invalid Credentials"
+        }) 
+    }
+
+    const token = jwt.sign(
+        {
+            id: user._id,
+            username: user.username
+        },process.env.JWT_SECRET, {expiresIn:'3d'}
+    )
+
+    res.cookie('token', token)
+
+    res.status(200).json({
+        message:"loggedIn",
+        user:{
+            id:user._id,
+            username:user.username,
+            email:user.email
+        }
+    })
+
+    
+}
+
+module.exports={
+    userRegisterController,
+    userLoginController
+}
