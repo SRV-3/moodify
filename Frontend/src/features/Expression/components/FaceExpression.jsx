@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { initialize, detect } from "../utils/utils";
 
 
-export default function FaceExpression() {
+export default function FaceExpression({onClick=()=>{}}) {
   const videoRef = useRef(null);
   const animationFrameId = useRef(null);
   const faceLandmarkerRef = useRef(null);
@@ -25,6 +25,11 @@ export default function FaceExpression() {
     };
   }, []);
 
+  async function handleClick() {
+    const emote = detect({videoRef,faceLandmarkerRef,animationFrameId,setExpression,expression})
+    onClick(detect)
+  }
+
   return (
     <div style={{ textAlign: "center" }}>
       <h2>Live Emotion Detector</h2>
@@ -41,7 +46,7 @@ export default function FaceExpression() {
         Expression: {expression}
       </h3>
 
-      <button onClick={()=>{detect({videoRef,faceLandmarkerRef,animationFrameId,setExpression})}}>Detect Expression</button>
+      <button onClick={handleClick}>Detect Expression</button>
     </div>
   );
 }

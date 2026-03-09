@@ -27,7 +27,7 @@ export const initialize = async ({videoRef,faceLandmarkerRef,stream}) => {
       };
 };
 
-export const detect = ({videoRef,faceLandmarkerRef,animationFrameId,setExpression}) => {
+export const detect = ({videoRef,faceLandmarkerRef,animationFrameId,setExpression,expression}) => {
       if (!videoRef.current || !faceLandmarkerRef.current) return;
     
 
@@ -64,19 +64,22 @@ export const detect = ({videoRef,faceLandmarkerRef,animationFrameId,setExpressio
         
         // 3️⃣ Simple Emotion Logic
         if (smileLeft > 0.5 && smileRight > 0.5) {
-          setExpression("😊 Happy");
+          setExpression("happy");
         } else if (mouthOpen > 0.5) {
-          setExpression("😮 Surprised");
+          setExpression("surprised");
         } else if (browDown > 0.5) {
-          setExpression("😠 Angry");
+          setExpression("angry");
         } else if (mouthShrugLower > 0.5) {
-          setExpression("😔 Sad");
+          setExpression("sad");
         }else {
-          setExpression("😐 Neutral");
+          setExpression("neutral");
         }
       } else {
         setExpression("No Face Detected");
       }
 
       animationFrameId.current = requestAnimationFrame(detect);
+      console.log(expression)
+
+      return expression
 };
