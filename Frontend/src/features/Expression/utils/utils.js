@@ -27,59 +27,39 @@ export const initialize = async ({videoRef,faceLandmarkerRef,stream}) => {
       };
 };
 
-export const detect = ({videoRef,faceLandmarkerRef,animationFrameId,setExpression,expression}) => {
-      if (!videoRef.current || !faceLandmarkerRef.current) return;
-    
+export const detect = ({ videoRef, faceLandmarkerRef }) => {
+  if (!videoRef?.current || !faceLandmarkerRef?.current) return "No Face";
 
-      const results =
-        faceLandmarkerRef.current.detectForVideo(
-          videoRef.current,
-          performance.now()
-        );
+  const results = faceLandmarkerRef.current.detectForVideo(
+    videoRef.current,
+    performance.now()
+  );
 
-      if (results.faceBlendshapes?.length > 0) {
-        const blendShapes = results.faceBlendshapes[0].categories;
-        
+  if (results.faceBlendshapes?.length > 0) {
+    const blendShapes = results.faceBlendshapes[0].categories;
 
-        const smileLeft = blendShapes.find(
-          (b) => b.categoryName === "mouthSmileLeft"
-        )?.score || 0;
+    const smileLeft =
+      blendShapes.find(b => b.categoryName === "mouthSmileLeft")?.score || 0;
 
-        const smileRight = blendShapes.find(
-          (b) => b.categoryName === "mouthSmileRight"
-        )?.score || 0;
+    const smileRight =
+      blendShapes.find(b => b.categoryName === "mouthSmileRight")?.score || 0;
 
-        const mouthOpen = blendShapes.find(
-          (b) => b.categoryName === "jawOpen"
-        )?.score || 0;
+    const mouthOpen =
+      blendShapes.find(b => b.categoryName === "jawOpen")?.score || 0;
 
-        const browDown = blendShapes.find(
-          (b) => b.categoryName === "browDownLeft"
-        )?.score || 0;
+    const browDown =
+      blendShapes.find(b => b.categoryName === "browDownLeft")?.score || 0;
 
-        const mouthShrugLower = blendShapes.find(
-          (b) => b.categoryName === "mouthShrugLower"
-        )?.score || 0;
-        
-        
-        // 3️⃣ Simple Emotion Logic
-        if (smileLeft > 0.5 && smileRight > 0.5) {
-          setExpression("happy");
-        } else if (mouthOpen > 0.5) {
-          setExpression("surprised");
-        } else if (browDown > 0.5) {
-          setExpression("angry");
-        } else if (mouthShrugLower > 0.5) {
-          setExpression("sad");
-        }else {
-          setExpression("neutral");
-        }
-      } else {
-        setExpression("No Face Detected");
-      }
+    const mouthShrugLower =
+      blendShapes.find(b => b.categoryName === "mouthShrugLower")?.score || 0;
 
-      animationFrameId.current = requestAnimationFrame(detect);
-      console.log(expression)
+    if (smileLeft > 0.5 && smileRight > 0.5) return "happy";
+    if (mouthOpen > 0.5) return "surprised";
+    if (browDown > 0.5) return "angry";
+    if (mouthShrugLower > 0.5) return "sad";
 
-      return expression
+    return "neutral";
+  }
+
+  return "No Face Detected";
 };

@@ -26,9 +26,12 @@ export default function FaceExpression({onClick=()=>{}}) {
   }, []);
 
   async function handleClick() {
-    const emote = detect({videoRef,faceLandmarkerRef,animationFrameId,setExpression,expression})
-    onClick(detect)
-  }
+  const emote = detect({ videoRef, faceLandmarkerRef });
+
+  setExpression(emote);
+
+  onClick(emote); // Home ko bhej rahe
+}
 
   return (
     <div style={{ textAlign: "center" }}>
