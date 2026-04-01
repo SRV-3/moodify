@@ -5,7 +5,9 @@ function Protected({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return (
+      <a href="https://moodify-9uoh.onrender.com/api/auth/login">Login Here</a>
+    );
   }
 
   if (!user) {
