@@ -1,22 +1,29 @@
-const cookieParser = require('cookie-parser')
-const express = require('express')
-const cors = require('cors')
+const cookieParser = require("cookie-parser");
+const express = require("express");
+const cors = require("cors");
 
-const app = express()
-app.use(express.json())
-app.use(cookieParser())
-app.use(cors({
-    origin:"http://localhost:5173",
-    credentials:true
-}))
+const app = express();
+app.use(express.json());
+app.use(express.static("public"));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 /*
-*routes
-*/
-const authRoutes = require('./routes/auth.routes')
-const songRoutes = require('./routes/song.routes')
+ *routes
+ */
+const authRoutes = require("./routes/auth.routes");
+const songRoutes = require("./routes/song.routes");
 
-app.use("/api/auth", authRoutes)
-app.use("/api/song", songRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/song", songRoutes);
 
-module.exports = app
+app.get("*name", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "/public/index.html"));
+});
+
+module.exports = app;
