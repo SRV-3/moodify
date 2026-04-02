@@ -36,10 +36,7 @@ async function userRegisterController(req, res) {
     },
   );
 
-  res.cookie("token", token, {
-    secure: true,
-    sameSite: "none",
-  });
+  res.cookie("token", token);
 
   res.status(201).json({
     message: "User created successfully",
@@ -83,10 +80,7 @@ async function userLoginController(req, res) {
     { expiresIn: "3d" },
   );
 
-  res.cookie("token", token, {
-    secure: true,
-    sameSite: "none",
-  });
+  res.cookie("token", token);
 
   res.status(200).json({
     message: "loggedIn",
