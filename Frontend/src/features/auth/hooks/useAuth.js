@@ -22,9 +22,15 @@ export const useAuth = () => {
 
   async function handleGetMe() {
     setLoading(true);
-    const data = await getMe();
-    setUser(data.user);
-    setLoading(false);
+
+    try {
+      const data = await getMe();
+      setUser(data.user);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handlelogout() {
@@ -33,10 +39,6 @@ export const useAuth = () => {
     setUser(null);
     setLoading(false);
   }
-
-  useEffect(() => {
-    handleGetMe();
-  }, []);
 
   return {
     user,
